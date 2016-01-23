@@ -1,0 +1,6 @@
+apply plugin: 'java'
+
+dependencies {
+    // LOCAL BINARY DEPENDENCY
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

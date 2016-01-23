@@ -1,0 +1,76 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        applicationId project.APPLICATION_ID
+        versionName project.VERSION_NAME
+        versionCode Integer.parseInt(project.VERSION_CODE)
+        minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+    }
+    signingConfigs {
+        release {
+            def propFile = file('../.signing/signing.properties')
+            if (propFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propFile))
+
+                storeFile = file(props['STORE_FILE'])
+                storePassword = props['STORE_PASSWORD']
+                keyAlias = props['KEY_ALIAS']
+                keyPassword = props['KEY_PASSWORD']
+            }
+        }
+    }
+    productFlavors {
+        //Paid Version
+        pro {
+            applicationId = project.APPLICATION_ID + ".pro"
+            versionName project.VERSION_NAME + "-pro"
+            //Accessed in java code as BuildConfig.IS_PRO_VERSION
+            buildConfigField "boolean", "IS_PRO_VERSION", "true"
+            productFlavors.pro.signingConfig signingConfigs.release
+
+        }
+        //Free Version
+        free {
+            applicationId = project.APPLICATION_ID + ".free"
+            versionName project.VERSION_NAME + "-free"
+            //Accessed in java code as BuildConfig.IS_PRO_VERSION
+            buildConfigField "boolean", "IS_PRO_VERSION", "false"
+            productFlavors.free.signingConfig signingConfigs.release
+
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            // Show the logs when debugging
+            buildConfigField "Boolean", "IS_DEBUG_MODE", "true"
+        }
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Hide all the logs on product release
+            buildConfigField "Boolean", "IS_DEBUG_MODE", "false"
+        }
+    }
+}
+
+dependencies {
+    // LOCAL BINARY DEPENDENCY
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // MODULE DEPENDENCY
+    compile project(':libraries:common')
+    compile project(':libraries:android')
+    compile project(path: ':libraries:backend', configuration: 'android-endpoints')
+    // REMOTE BINARY DEPENDENCY - Android
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    // REMOTE BINARY DEPENDENCY - Third Party
+    // Use - AdMob support
+    compile 'com.google.android.gms:play-services:7.3.0'
+    // Use - View Injection support
+    compile 'com.jakewharton:butterknife:7.0.1'
+}
