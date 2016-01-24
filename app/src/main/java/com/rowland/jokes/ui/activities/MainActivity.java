@@ -98,7 +98,7 @@ public class MainActivity extends BaseToolBarActivity {
 
     private void beginJoking() {
 
-        Toast.makeText(this, "Working on It", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Working on It", Toast.LENGTH_SHORT).show();
 
         new EndpointAsyncTask(this, mProgressBar, new onFinishCallBack() {
             @Override
