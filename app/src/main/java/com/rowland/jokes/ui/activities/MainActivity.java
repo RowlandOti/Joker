@@ -1,23 +1,40 @@
 package com.rowland.jokes.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.rowland.common.ui.activities.BaseToolBarActivity;
 import com.rowland.jokes.R;
+import com.rowland.jokes.android.JokesActivity;
+import com.rowland.jokes.asynctask.EndpointAsyncTask;
 import com.rowland.jokes.ui.fragments.MainFragment;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 
 public class MainActivity extends BaseToolBarActivity {
+
+    // Logging tracker for this class
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    // ButterKnife bound views
+    @Bind(R.id.progressbar)
+    ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Inflate the layout
         setContentView(R.layout.activity_main);
+        // Initialize the views
+        ButterKnife.bind(this);
         // However, if we're being restored from a previous state, then we don't need to do anything
         // and should return or else we could end up with overlapping fragments.
         if (savedInstanceState != null) {
@@ -44,9 +61,27 @@ public class MainActivity extends BaseToolBarActivity {
         ft.commit();
     }
 
-
     public void tellJoke(View view) {
-        Toast.makeText(this, "derp", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Working on It", Toast.LENGTH_LONG).show();
+
+        new EndpointAsyncTask(this, mProgressBar, new onFinishCallBack() {
+            @Override
+            public void showActivity(Context context, String result) {
+                // Acquire new Intent object
+                Intent intent = new Intent(context, JokesActivity.class);
+                // Send the result to the called activity
+                intent.putExtra(JokesActivity.INTENT_DELIVERED_JOKE, result);
+                // Retain a previous activity
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        }).execute();
+    }
+
+
+    public interface onFinishCallBack {
+
+        void showActivity(Context context, String result);
     }
 
 
