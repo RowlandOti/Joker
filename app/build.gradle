@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId project.APPLICATION_ID
@@ -11,6 +11,7 @@ android {
         minSdkVersion Integer.parseInt(project.ANDROID_BUILD_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
         multiDexEnabled true
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     signingConfigs {
         release {
@@ -29,7 +30,7 @@ android {
     productFlavors {
         //Paid Version
         pro {
-            applicationId = project.APPLICATION_ID + ".pro"
+            applicationId = project.APPLICATION_ID
             versionName project.VERSION_NAME + "-pro"
             //Accessed in java code as BuildConfig.IS_PRO_VERSION
             buildConfigField "boolean", "IS_PRO_VERSION", "true"
@@ -38,7 +39,7 @@ android {
         }
         //Free Version
         free {
-            applicationId = project.APPLICATION_ID + ".free"
+            applicationId = project.APPLICATION_ID
             versionName project.VERSION_NAME + "-free"
             //Accessed in java code as BuildConfig.IS_PRO_VERSION
             buildConfigField "boolean", "IS_PRO_VERSION", "false"
@@ -58,20 +59,50 @@ android {
             buildConfigField "Boolean", "IS_DEBUG_MODE", "false"
         }
     }
+
+    sourceSets {
+        test {
+            java.srcDir file('src/androidTest/java')
+        }
+        androidTest {
+            java.srcDir file('src/test/java')
+        }
+    }
 }
 
 dependencies {
     // LOCAL BINARY DEPENDENCY
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    // TEST BINARY DEPENDENCIES
+    testCompile 'junit:junit:4.12'
     // MODULE DEPENDENCY
     compile project(':libraries:common')
     compile project(':libraries:android')
     compile project(path: ':libraries:backend', configuration: 'android-endpoints')
-    // REMOTE BINARY DEPENDENCY - Android
+    // REMOTE BINARY DEPENDENCY - Android/Google
     compile 'com.android.support:appcompat-v7:23.1.1'
-    // REMOTE BINARY DEPENDENCY - Third Party
     // Use - AdMob support
     compile 'com.google.android.gms:play-services:7.3.0'
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile('com.android.support.test:runner:0.3') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestCompile('com.android.support.test:rules:0.3') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    // Use -- UI testing with UI Automator
+    //androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
+    // Use -- Hamcrest library
+    //androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+    // Use -- UI testing with Espresso
+    //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    // REMOTE BINARY DEPENDENCY - Third Party
     // Use - View Injection support
     compile 'com.jakewharton:butterknife:7.0.1'
 }
+
+task androidTest(type: Test, dependsOn: assemble) {
+    //testClassesDir = android.sourceSets.androidTest.output.classesDir
+    //classpath = android.sourceSets.androidTest.runtimeClasspath
+}
+check.dependsOn androidTest
