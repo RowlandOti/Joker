@@ -13,6 +13,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.rowland.common.ui.activities.BaseToolBarActivity;
+import com.rowland.jokes.BuildConfig;
 import com.rowland.jokes.R;
 import com.rowland.jokes.android.JokesActivity;
 import com.rowland.jokes.asynctask.EndpointAsyncTask;
@@ -88,13 +89,18 @@ public class MainActivity extends BaseToolBarActivity {
     }
 
     public void tellJoke(View view) {
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        } else {
-            beginJoking();
+        // Display ads only in free version
+        if (!BuildConfig.IS_PRO_VERSION) {
+            if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            } else {
+                beginJoking();
+            }
+            // Hide ads in pro version
+        }else {
+            beginJoking();;
         }
-
-    }
+        }
 
     private void beginJoking() {
 
