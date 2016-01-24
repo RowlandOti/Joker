@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.rowland.common.ui.activities.BaseToolBarActivity;
 import com.rowland.jokes.R;
 import com.rowland.jokes.android.JokesActivity;
@@ -24,6 +27,8 @@ public class MainActivity extends BaseToolBarActivity {
     // Logging tracker for this class
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    InterstitialAd mInterstitialAd;
+
     // ButterKnife bound views
     @Bind(R.id.progressbar)
     ProgressBar mProgressBar;
@@ -35,6 +40,19 @@ public class MainActivity extends BaseToolBarActivity {
         setContentView(R.layout.activity_main);
         // Initialize the views
         ButterKnife.bind(this);
+        //
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                beginJoking();
+            }
+        });
+
+        requestNewInterstitial();
         // However, if we're being restored from a previous state, then we don't need to do anything
         // and should return or else we could end up with overlapping fragments.
         if (savedInstanceState != null) {
@@ -46,6 +64,14 @@ public class MainActivity extends BaseToolBarActivity {
             // Pass bundle to the fragment
             showMainFragment(null);
         }
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
     }
 
     // Insert the MainFragment
@@ -62,6 +88,16 @@ public class MainActivity extends BaseToolBarActivity {
     }
 
     public void tellJoke(View view) {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            beginJoking();
+        }
+
+    }
+
+    private void beginJoking() {
+
         Toast.makeText(this, "Working on It", Toast.LENGTH_LONG).show();
 
         new EndpointAsyncTask(this, mProgressBar, new onFinishCallBack() {
