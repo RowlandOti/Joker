@@ -100,7 +100,7 @@ public class MainActivity extends BaseToolBarActivity {
         }else {
             beginJoking();;
         }
-        }
+    }
 
     private void beginJoking() {
 

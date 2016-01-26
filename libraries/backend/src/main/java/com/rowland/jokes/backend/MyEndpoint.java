@@ -10,21 +10,23 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 
-import javax.inject.Named;
-
-/** An endpoint class we are exposing */
+/**
+ * An endpoint class we are exposing
+ */
 @Api(
-  name = "myApi",
-  version = "v1",
-  namespace = @ApiNamespace(
-    ownerDomain = "backend.jokes.rowland.com",
-    ownerName = "backend.jokes.rowland.com",
-    packagePath=""
-  )
+        name = "myApi",
+        version = "v1",
+        namespace = @ApiNamespace(
+                ownerDomain = "backend.jokes.rowland.com",
+                ownerName = "backend.jokes.rowland.com",
+                packagePath = ""
+        )
 )
 public class MyEndpoint {
 
-    /** A simple endpoint method that returns a joke */
+    /**
+     * A simple endpoint method that returns a joke
+     */
     @ApiMethod(name = "deliverJoke")
     public MyBean deliverJoke(MyBean joke) {
         return joke;

@@ -2,7 +2,9 @@ package com.rowland.jokes.backend;
 
 import com.rowland.jokes.JokesVendor;
 
-/** The object model for the data we are sending through endpoints */
+/**
+ * The object model for the data we are sending through endpoints
+ */
 public class MyBean {
 
     private JokesVendor jokeVendor;
